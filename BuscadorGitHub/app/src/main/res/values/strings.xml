@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Buscador GitHub</string>
+    <string name="buscar">buscar</string>
+</resources>
