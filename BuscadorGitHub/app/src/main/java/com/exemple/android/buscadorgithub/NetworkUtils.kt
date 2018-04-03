@@ -65,7 +65,7 @@ class NetworkUtils {
 
 
 
-        fun obterRespostaDaUrlHtpp(url: URL): String? {
+        fun obterRespostaDaUrlHttp(url: URL): String? {
 
             val urlConnection = url.openConnection() as HttpURLConnection
 

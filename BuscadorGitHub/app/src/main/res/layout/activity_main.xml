@@ -31,18 +31,43 @@
         />
 
 
-
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_github_resultado"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Faça uma busca!"
-            android:textSize="18dp" />
-    </ScrollView>
+            android:paddingTop="16dp">
+
+            <TextView
+                android:id="            @+id/tv_github_resultado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Faça uma busca!"
+                android:textSize="18dp" />
+
+        </ScrollView>
+
+    <TextView
+        android:id="@+id/tv_mensagem_erro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mensagem_erro"
+        android:layout_gravity="center"
+        android:textSize="22sp"
+        android:textColor="#ff0000"
+        android:padding="16dp"
+        android:visibility="invisible"/>
+
+   <ProgressBar
+       android:id="@+id/pb_aguarde"
+       android:layout_width="42dp"
+       android:layout_height="42dp"
+       android:layout_gravity="center"
+       android:visibility="invisible"
+       />
+
+    </FrameLayout>
 
 </LinearLayout>
