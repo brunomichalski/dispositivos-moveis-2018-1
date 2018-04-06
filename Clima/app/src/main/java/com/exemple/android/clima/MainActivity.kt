@@ -6,10 +6,15 @@ import android.os.Bundle
 import android.test.TouchUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 
-
+import android.text.format.DateFormat
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URL
+
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -68,6 +73,24 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    fun exibirResultado(){
+        dados_clima.visibility = View.VISIBLE
+        tv_mensagem_erro.visibility = View.INVISIBLE
+        pb_aguarde.visibility = View.INVISIBLE
+    }
+
+    fun exibirMensagemErro(){
+        tv_mensagem_erro.visibility = View.VISIBLE
+        dados_clima.visibility = View.INVISIBLE
+        pb_aguarde.visibility = View.INVISIBLE
+    }
+
+    fun exibirProgressBar(){
+        pb_aguarde.visibility = View.VISIBLE
+        dados_clima.visibility = View.INVISIBLE
+        tv_mensagem_erro.visibility = View.INVISIBLE
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.acao_atualizar){
             dados_clima.text = ""
@@ -78,6 +101,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     inner  class BuscarClimaTask : AsyncTask <URL, Void, String>(){
+
+        override fun onPreExecute() {
+            exibirProgressBar()
+        }
 
         override fun doInBackground(vararg params: URL?): String? {
            try {
@@ -91,7 +118,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(result: String?) {
-            dados_clima.text = result
+            if (result != null){
+                infomacoes(result)
+                exibirResultado()
+            }else{
+                exibirMensagemErro()
+            }
+        }
+
+        fun infomacoes (resultado : String?){
+
+            val json = JSONObject(resultado)
+            val lista = json.getJSONArray("list")
+            for (i in 0 until  lista.length()){
+                val lista1 = lista.getJSONObject(i)
+                val dataLong = lista1.getString("dt")
+                val data = converterData(dataLong)
+                val main = lista1.getJSONObject("main")
+                val temp = main.getString("temp")
+                val umidade = main.getString("humidity")
+                val clima = lista1.getJSONArray("weather")
+                val clima1 = clima.getJSONObject(0)
+                val descClima = clima1.getString("description")
+                dados_clima.append("Data: $data \n" +
+                                    "temperatura: $temp \n" +
+                                    "Umidade: $umidade \n" +
+                                    "Clima: $descClima \n\n\n")
+
+            }
+
+        }
+
+        fun converterData(data: String):CharSequence?{
+            val dataHoraMilissegundo: Long = (java.lang.Long.valueOf(data)) * 1000
+            val dataHora = Date(dataHoraMilissegundo)
+            return DateFormat.format("dd/MM/yyyy HH:mm", dataHora)
         }
 
     }
