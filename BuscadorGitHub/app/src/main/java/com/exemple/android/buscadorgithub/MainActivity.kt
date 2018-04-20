@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 }"""
 
         val objetoPrevisao = JSONObject(dadosJson)
-        val clima = objetoPrevisao.getJSONObject("C                 lima")
+        val clima = objetoPrevisao.getJSONObject("Clima")
         val condicao =clima.getString("condicao")
         Log.d("a condição é :","$condicao")
     }

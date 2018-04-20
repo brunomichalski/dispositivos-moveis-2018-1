@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/acao_modificar"
+        android:orderInCategory="1"
+        android:title="Modificar" />
+
+    <item
+        android:id="@+id/acao_remover"
+        android:orderInCategory="2"
+        android:title="Remover" />
+
+    <item
+        android:id="@+id/acao_finalizar"
+        android:orderInCategory="3"
+        android:title="Finalizar" />
+</menu>

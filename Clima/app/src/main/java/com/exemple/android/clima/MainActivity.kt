@@ -1,8 +1,10 @@
 package com.exemple.android.clima
 
+import android.content.Context
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.test.TouchUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -18,33 +20,36 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-  /*  val dadosClimaFicticios = listOf("Hoje - Céu limpo - 17°C / 15°C",
 
-            "Amanhã - Nublado - 19°C / 15°C",
-
-            "Quinta - Chuv  oso - 30°C / 11°C",
-
-            "Sexta - Chuva com raios - 21°C / 9°C",
-
-            "Sábado - Chuva com raios - 16°C / 7°C",
-
-            "Domingo - Chuvoso - 16°C / 8°C",
-
-            "Segunda - Parcialmente nublado - 15°C / 10°C",
-
-            "Ter, Mai 24 - Vai curintia - 16°C / 18°C",
-
-            "Qua, Mai 25 - Nublado - 19°C / 15°C",
-
-            "Qui, Mai 26 - Tempestade - 30°C / 11°C",
-
-            "Sex, Mai 27 - Furacão - 21°C / 9°C",
-
-            "Sáb, Mai 28 - Meteóro - 16°C / 7°C",
-
-            "Dom, Mai 29 - Apocalipse - 16°C / 8°C",
-
-            "Seg, Mai 30 - Pós-apocalipse - 15°C / 10°C")*/
+    val previsaoAdapter : PrevisaoAdapter? = null
+    var context : Context = this
+//      val dadosClimaFicticios = listOf("Hoje - Céu limpo - 17°C / 15°C",
+//
+//            "Amanhã - Nublado - 19°C / 15°C",
+//
+//            "Quinta - Chuv  oso - 30°C / 11°C",
+//
+//            "Sexta - Chuva com raios - 21°C / 9°C",
+//
+//            "Sábado - Chuva com raios - 16°C / 7°C",
+//
+//            "Domingo - Chuvoso - 16°C / 8°C",
+//
+//            "Segunda - Parcialmente nublado - 15°C / 10°C",
+//
+//            "Ter, Mai 24 - Vai curintia - 16°C / 18°C",
+//
+//            "Qua, Mai 25 - Nublado - 19°C / 15°C",
+//
+//            "Qui, Mai 26 - Tempestade - 30°C / 11°C",
+//
+//            "Sex, Mai 27 - Furacão - 21°C / 9°C",
+//
+//            "Sáb, Mai 28 - Meteóro - 16°C / 7°C",
+//
+//            "Dom, Mai 29 - Apocalipse - 16°C / 8°C",
+//
+//            "Seg, Mai 30 - Pós-apocalipse - 15°C / 10°C")
 
 
 
@@ -54,11 +59,14 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
+         val previsaoAdapter = PrevisaoAdapter (null)
 
-       /* for (clima in dadosClimaFicticios){
-            dados_clima.append("$clima \n\n\n")
-        }*/
-
+        rv_clima.layoutManager = layoutManager
+        rv_clima.adapter = previsaoAdapter
+//        for (clima in dadosClimaFicticios){
+//            rv_clima.append("$clima \n\n\n")
+//        }
          carregarDadosDoClima()
     }
 
@@ -74,26 +82,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun exibirResultado(){
-        dados_clima.visibility = View.VISIBLE
+        rv_clima.visibility = View.VISIBLE
         tv_mensagem_erro.visibility = View.INVISIBLE
         pb_aguarde.visibility = View.INVISIBLE
     }
 
     fun exibirMensagemErro(){
         tv_mensagem_erro.visibility = View.VISIBLE
-        dados_clima.visibility = View.INVISIBLE
+        rv_clima.visibility = View.INVISIBLE
         pb_aguarde.visibility = View.INVISIBLE
     }
 
     fun exibirProgressBar(){
         pb_aguarde.visibility = View.VISIBLE
-        dados_clima.visibility = View.INVISIBLE
+        rv_clima.visibility = View.INVISIBLE
         tv_mensagem_erro.visibility = View.INVISIBLE
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.acao_atualizar){
-            dados_clima.text = ""
+//            rv_clima.text = ""
             carregarDadosDoClima()
             return true
         }
@@ -119,35 +127,36 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             if (result != null){
-                infomacoes(result)
+                val res = JsonUtils.getSimplesStringsDeClimaDoJson(context ,result)
+                previsaoAdapter?.setDadosdoClima(res)
                 exibirResultado()
             }else{
                 exibirMensagemErro()
             }
         }
 
-        fun infomacoes (resultado : String?){
-
-            val json = JSONObject(resultado)
-            val lista = json.getJSONArray("list")
-            for (i in 0 until  lista.length()){
-                val lista1 = lista.getJSONObject(i)
-                val dataLong = lista1.getString("dt")
-                val data = converterData(dataLong)
-                val main = lista1.getJSONObject("main")
-                val temp = main.getString("temp")
-                val umidade = main.getString("humidity")
-                val clima = lista1.getJSONArray("weather")
-                val clima1 = clima.getJSONObject(0)
-                val descClima = clima1.getString("description")
-                dados_clima.append("Data: $data \n" +
-                                    "temperatura: $temp \n" +
-                                    "Umidade: $umidade \n" +
-                                    "Clima: $descClima \n\n\n")
-
-            }
-
-        }
+//        fun infomacoes (resultado : String?){
+//
+//            val json = JSONObject(resultado)
+//            val lista = json.getJSONArray("list")
+//            for (i in 0 until  lista.length()){
+//                val lista1 = lista.getJSONObject(i)
+//                val dataLong = lista1.getString("dt")
+//                val data = converterData(dataLong)
+//                val main = lista1.getJSONObject("main")
+//                val temp = main.getString("temp")
+//                val umidade = main.getString("humidity")
+//                val clima = lista1.getJSONArray("weather")
+//                val clima1 = clima.getJSONObject(0)
+//                val descClima = clima1.getString("description")
+//                rv_clima.add("Data: $data \n" +
+//                                    "temperatura: $temp \n" +
+//                                    "Umidade: $umidade \n" +
+//                                   "Clima: $descClima \n\n\n")
+//
+//            }
+//
+//        }
 
         fun converterData(data: String):CharSequence?{
             val dataHoraMilissegundo: Long = (java.lang.Long.valueOf(data)) * 1000

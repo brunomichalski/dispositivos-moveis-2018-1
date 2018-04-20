@@ -41,7 +41,7 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="            @+id/tv_github_resultado"
+                android:id="@+id/tv_github_resultado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Faça uma busca!"
