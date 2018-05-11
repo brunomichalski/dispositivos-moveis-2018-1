@@ -3,6 +3,12 @@ package com.exemple.android.buscadorgithub
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.AsyncTaskLoader
+import android.support.v4.content.Loader
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -15,7 +21,68 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> {
+
+    companion object {
+        var URL_BUSCA = "URL_BUSCA"
+        val BUSCA_GITHUB_LOADER_ID = 1000
+        val CONTEUDO_TEXTVIEW = "CONTEUDO_TEXTVIEW"
+
+
+    }
+
+    var cacheResultado :String? = null
+
+    override fun onCreateLoader(id: Int, parametros: Bundle?): Loader<String> {
+        val loader =  object : AsyncTaskLoader<String>(this){
+
+            override fun onStartLoading() {
+                super.onStartLoading()
+                if (parametros == null){
+                    return
+                }
+                exibirProgressbar()
+                if (cacheResultado != null){
+                    deliverResult(cacheResultado)
+                }
+                forceLoad()
+            }
+
+            override fun loadInBackground(): String? {
+                try {
+                    var urlBusca = parametros?.getString(URL_BUSCA)
+                    val url = URL(urlBusca)
+                    val resultado = NetworkUtils.obterRespostaDaUrlHttp(url!!);
+                    return  resultado
+
+                }catch (ex : Exception){
+                    ex.printStackTrace();
+                }
+                return null;
+            }
+
+            override fun deliverResult(data: String?) {
+                super.deliverResult(data)
+                cacheResultado = data
+            }
+
+        }
+        return loader
+    }
+
+    override fun onLoadFinished(loader: Loader<String>?, resultado: String?) {
+        if (resultado != null){
+            tv_github_resultado.text = resultado
+            exibirResultado()
+        }else{
+            exibirMensagemErro()
+        }
+    }
+
+    override fun onLoaderReset(loader: Loader<String>?) {
+
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -28,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,7 +107,29 @@ class MainActivity : AppCompatActivity() {
 
         val engine = sslContext.createSSLEngine()
 
-        exercicioJson()
+
+
+
+        et_busca.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                cacheResultado = null
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        })
+
+        supportLoaderManager.initLoader(BUSCA_GITHUB_LOADER_ID, null, this)
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(CONTEUDO_TEXTVIEW)) {
+                val conteudoURLGit = savedInstanceState.getString(CONTEUDO_TEXTVIEW)
+                tv_url.text = conteudoURLGit
+            }
+        }
     }
 
     fun buscarNoGithub(){
@@ -48,8 +138,13 @@ class MainActivity : AppCompatActivity() {
         tv_url.text = urlBuscaGithub.toString()
 
         if(urlBuscaGithub != null) {
-            val task = GithubBuscaTask();
-            task.execute(urlBuscaGithub);
+//            val task = GithubBuscaTask();
+//            task.execute(urlBuscaGithub);
+
+            val parametros = Bundle()
+            parametros.putString(URL_BUSCA, urlBuscaGithub.toString())
+
+            supportLoaderManager.restartLoader(BUSCA_GITHUB_LOADER_ID, parametros, this)
         }
 
     }
@@ -96,31 +191,12 @@ class MainActivity : AppCompatActivity() {
         Log.d("a condição é :","$condicao")
     }
 
-    inner class GithubBuscaTask : AsyncTask <URL, Void, String>(){
-
-        override fun onPreExecute() {
-            exibirProgressbar()
-        }
-
-        override fun doInBackground(vararg params: URL?): String? {
-
-            try {
-                val url = params[0]
-                val resultado = NetworkUtils.obterRespostaDaUrlHttp(url!!);
-                return  resultado
-            }catch (ex : Exception){
-                ex.printStackTrace();
-            }
-            return null;
-        }
-
-        override fun onPostExecute(resultado: String?) {
-            if (resultado != null){
-            tv_github_resultado.text = resultado
-                exibirResultado()
-            }else{
-                exibirMensagemErro()
-            }
-        }
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        val conteudoUrlGit = tv_url.text.toString()
+        outState?.putString(CONTEUDO_TEXTVIEW, conteudoUrlGit)
     }
+
+
+
 }

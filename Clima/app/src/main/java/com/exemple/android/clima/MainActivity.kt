@@ -1,6 +1,7 @@
 package com.exemple.android.clima
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -18,11 +19,11 @@ import java.net.URL
 
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PrevisaoAdapter.PrevisaoItemClickListener {
 
 
-    val previsaoAdapter : PrevisaoAdapter? = null
-    var context : Context = this
+    var previsaoAdapter : PrevisaoAdapter? = null
+   var context : Context = this
 //      val dadosClimaFicticios = listOf("Hoje - Céu limpo - 17°C / 15°C",
 //
 //            "Amanhã - Nublado - 19°C / 15°C",
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false)
-         val previsaoAdapter = PrevisaoAdapter (null)
+          previsaoAdapter = PrevisaoAdapter(null, this)
 
         rv_clima.layoutManager = layoutManager
         rv_clima.adapter = previsaoAdapter
@@ -108,6 +109,8 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+
+
     inner  class BuscarClimaTask : AsyncTask <URL, Void, String>(){
 
         override fun onPreExecute() {
@@ -128,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         override fun onPostExecute(result: String?) {
             if (result != null){
                 val res = JsonUtils.getSimplesStringsDeClimaDoJson(context ,result)
-                previsaoAdapter?.setDadosdoClima(res)
+                previsaoAdapter?.setDadosClima(res)
                 exibirResultado()
             }else{
                 exibirMensagemErro()
@@ -164,6 +167,32 @@ class MainActivity : AppCompatActivity() {
             return DateFormat.format("dd/MM/yyyy HH:mm", dataHora)
         }
 
+        override fun onItemClick(index: Int) {
+
+            val previsao = previsaoAdapter!!.getDadosClima()!!.get(index)
+            val intentDetalhes = Intent(this, DetalhesActivity::class.java)
+
+            intentDetalhes.putExtra(DetalhesActivity.DADOS_PREVISAO, previsao)
+            startActivity(intentDetalhes)
+        }
+
+
+
+        fun abrirMapa() {
+
+            val addressString = "Campo Mourão, Paraná, Brasil"
+            val uriGeo = Uri.parse("geo:0,0?q=$addressString")
+            val intentMapa = Intent(Intent.ACTION_VIEW)
+
+            intentMapa.data = uriGeo
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(intentMapa)
+            }
+
+        }
+
     }
+
+
 
 }

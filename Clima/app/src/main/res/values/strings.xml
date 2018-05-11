@@ -88,5 +88,7 @@
 
     <string name="condicao_desconhecida">Desconhecido (<xliff:g id="condicaoId">%1$d</xliff:g>)</string>
     <string name="acao_atualizar">Atualizar</string>
+    <string name="acao_compartilhar">Compartilhar</string>
+    <string name="acao_mapa">Mapa</string>
     <string name="mensagem_erro">Não foi possivel obter dados do clima, Tente novamente</string>
 </resources>
