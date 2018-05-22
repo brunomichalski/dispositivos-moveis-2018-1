@@ -2,4 +2,17 @@
     <string name="app_name">Buscador GitHub</string>
     <string name="buscar">buscar</string>
     <string name="mensagem_erro">Não foi possivel obter o resultado, Tente novamente.</string>
+    <string name="pref_exibir_url">exibir_url</string>
+
+    <string name="pref_cor_fundo" translatable="false">cor_fundo</string>
+    <string name="pref_cor_fundo_padrao" translatable="false">@string/pref_cor_fundo_branco_valor</string>
+    <string name="pref_cor_fundo_titulo" translatable="false">Cor de fundo</string>
+
+    <string name="pref_cor_fundo_branco_titulo">Branco</string>
+    <string name="pref_cor_fundo_azul_titulo">Azul</string>
+    <string name="pref_cor_fundo_verde_titulo">Verde</string>
+
+    <string name="pref_cor_fundo_branco_valor" translatable="false">cor_fundo_branco</string>
+    <string name="pref_cor_fundo_azul_valor" translatable="false">cor_fundo_azul</string>
+    <string name="pref_cor_fundo_verde_valor" translatable="false">cor_fundo_verde</string>
 </resources>

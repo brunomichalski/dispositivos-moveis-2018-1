@@ -1,11 +1,15 @@
 package com.exemple.android.buscadorgithub
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.preference.PreferenceManager
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.AsyncTaskLoader
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.Loader
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,7 +25,18 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> {
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String>, SharedPreferences.OnSharedPreferenceChangeListener {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        if (key == getString(R.string.pref_exibir_url)){
+            val exibir_url = sharedPreferences.getBoolean(key, resources.getBoolean(R.bool.pref_exibir_url_padrao))
+            tv_url.visibility = if(exibir_url) View.VISIBLE else View.GONE
+        }else if (key == getString(R.string.pref_cor_fundo)){
+            val corFundo = sharedPreferences.getString(getString(R.string.pref_cor_fundo), getString(R.string.pref_cor_fundo_padrao))
+
+            val backgroundColor = selecionaCorDeFundo(corFundo)
+            window.decorView.setBackgroundColor(backgroundColor)
+        }
+    }
 
     companion object {
         var URL_BUSCA = "URL_BUSCA"
@@ -93,6 +108,10 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> 
         if (item?.itemId == R.id.action_buscar){
             buscarNoGithub()
         }
+        if (item?.itemId == R.id.action_configuracoes){
+            val intent = Intent(this, ConfiguracaoActivity::class.java)
+            startActivity(intent)
+        }
         return super.onOptionsItemSelected(item)
     }
 
@@ -106,6 +125,14 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> 
         sslContext.init(null, null, null)
 
         val engine = sslContext.createSSLEngine()
+
+
+        val sharePreference = PreferenceManager.getDefaultSharedPreferences(this)
+        sharePreference.registerOnSharedPreferenceChangeListener(this)
+        val exibirUrl = sharePreference.getBoolean(getString(R.string.pref_exibir_url), resources.getBoolean(R.bool.pref_exibir_url_padrao))
+        if (exibirUrl == false){
+            tv_url.visibility = View.INVISIBLE
+        }
 
 
 
@@ -130,6 +157,12 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> 
                 tv_url.text = conteudoURLGit
             }
         }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this)
     }
 
     fun buscarNoGithub(){
@@ -197,6 +230,14 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<String> 
         outState?.putString(CONTEUDO_TEXTVIEW, conteudoUrlGit)
     }
 
+    fun selecionaCorDeFundo(corFundo: String): Int {
+        return when (corFundo) {
+            getString(R.string.pref_cor_fundo_branco_valor) -> ContextCompat.getColor(this, R.color.fundoBranco)
+            getString(R.string.pref_cor_fundo_verde_valor) -> ContextCompat.getColor(this, R.color.fundoVerde)
+            getString(R.string.pref_cor_fundo_azul_valor) -> ContextCompat.getColor(this, R.color.fundoAzul)
+            else -> ContextCompat.getColor(this, R.color.fundoBranco)
+        }
+    }
 
 
 }

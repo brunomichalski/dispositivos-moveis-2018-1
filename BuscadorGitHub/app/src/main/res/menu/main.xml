@@ -6,7 +6,13 @@
         android:id="@+id/action_buscar"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"
-        android:title="@string/buscar"/>
+        android:title="buscar"/>
+
+    <item
+        android:id="@+id/action_configuracoes"
+        android:orderInCategory="2"
+        app:showAsAction="never"
+        android:title="configurações"/>
 
 
 </menu>
