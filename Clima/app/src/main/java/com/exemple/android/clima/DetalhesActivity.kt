@@ -59,4 +59,3 @@ package com.exemple.android.clima
         }
 
     }
-}
